@@ -6,7 +6,7 @@ try:
 		'cparametrizer.pyx'
 		]
 	
-	cythonize(pyx_src)
+	cythonize(pyx_src, compiler_directives={'language_level' : "3"})
 
 except ImportError:
 	pass

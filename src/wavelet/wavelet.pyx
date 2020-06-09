@@ -1,6 +1,9 @@
-#cython: boundscheck=False
-#cython: wraparound=False
-#cython: cdivision=False
+#!python
+# -*- coding: utf-8 -*-
+# cython: language_level=3
+# cython: boundscheck=False
+# cython: wraparound=False
+# cython: cdivision=False
 
 # Compile time constants
 DEF ZERO_BOUNDS = False
@@ -34,7 +37,7 @@ cdef void convolve_with_stepsize(float[:] source, float[:] target, float[:] kern
         double a
 
     for i in range(size):
-        index = i - kernelsize/2 * stepsize
+        index = i - kernelsize // 2 * stepsize
         a = 0.0
         for j in range(kernelsize):
             IF ZERO_BOUNDS:
@@ -59,7 +62,7 @@ cdef void convolve_x_with_stepsize(float[:,:,:] source, float[:,:,:] target, flo
     for z in range(zsize):
         for y in range(ysize):
             for x in range(xsize):
-                index = x - kernelsize/2 * stepsize
+                index = x - kernelsize // 2 * stepsize
                 target[z,y,x] = 0.0
                 for j in range(kernelsize):
                     IF ZERO_BOUNDS:
@@ -84,7 +87,7 @@ cdef void convolve_y_with_stepsize(float[:,:,:] source, float[:,:,:] target, flo
     for z in range(zsize):
         for y in range(ysize):
             for x in range(xsize):
-                index = y - kernelsize/2 * stepsize
+                index = y - kernelsize // 2 * stepsize
                 target[z,y,x] = 0.0
                 for j in range(kernelsize):
                     IF ZERO_BOUNDS:
@@ -109,7 +112,7 @@ cdef void convolve_z_with_stepsize(float[:,:,:] source, float[:,:,:] target, flo
     for z in range(zsize):
         for y in range(ysize):
             for x in range(xsize):
-                index = z - kernelsize/2 * stepsize
+                index = z - kernelsize // 2 * stepsize
                 target[z,y,x] = 0.0
                 for j in range(kernelsize):
                     IF ZERO_BOUNDS:
@@ -168,7 +171,7 @@ cdef class WaveletDecomposition2D1D:
             The data to decompose. The data are converted to float, i.e. single accuracy, values.
 
         xy_scales, z_scales : integer, optional
-            The spatial and spectral scales to use for data decomposition. 
+            The spatial and spectral scales to use for data decomposition.
             If either is less than 0 or not given, the scales are determined from the data, e.g. z_scales = ceil(log_2(data.shape[0])).
             If either scale is 0, no decomposition is performed for the corresponding axes.
         """
@@ -276,7 +279,7 @@ cdef class WaveletDecomposition2D1D:
                 convolve_y_with_stepsize(work[2], work[fine_xy], self._xy_mother_function, xy_scale_factor)
                 # Now, the previous coarse scale is in coarse_xy and the current coarse scale is in fine_xy
 
-                # Create the wavelet coefficients in coarse_xy by subtracting 
+                # Create the wavelet coefficients in coarse_xy by subtracting
                 # the current smooth scale contained in fine_xy
                 inplace_diff(work[coarse_xy], work[fine_xy])
                 # Now, the wavelet coefficients are in coarse_xy
@@ -286,7 +289,7 @@ cdef class WaveletDecomposition2D1D:
                 fine_xy = (fine_xy + 1) % 2
                 # Now the current coarse scale is in coarse_xy and the wavelet coefficients are in fine_xy
             else:
-                # In the last iteration, the "wavelet coefficients" to be analyzed by 
+                # In the last iteration, the "wavelet coefficients" to be analyzed by
                 # the spectral decomposition is just the maximally smoothed spatial scale
                 fine_xy = coarse_xy
 
@@ -408,7 +411,7 @@ cdef class Denoise2D1DHard(WaveletDecomposition2D1D):
             else:
                 raise ValueError(
                     "Thresholds must have shape %s"
-                    % (self.xy_scales + 1, self.z_scales + 1))
+                    % str(tuple(self.xy_scales + 1, self.z_scales + 1)))
 
 
     property total_power:

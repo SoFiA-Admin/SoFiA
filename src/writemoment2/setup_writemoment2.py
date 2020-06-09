@@ -8,6 +8,6 @@ from Cython.Build import cythonize
 
 setup(
 	name = 'New writemoment module',
-	ext_modules = cythonize("writemoment2.pyx"),
+	ext_modules = cythonize("writemoment2.pyx", compiler_directives={'language_level' : "3"}),
 	include_dirs = [numpy.get_include()],
 )

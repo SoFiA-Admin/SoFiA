@@ -1,3 +1,5 @@
+#!python
+# -*- coding: utf-8 -*-
 # cython: language_level=3
 # distutils: language = c++
 # distutils: sources = ModuleParametrisation.cpp Unit.cpp Measurement.cpp Source.cpp SourceCatalog.cpp helperFunctions.cpp MaskOptimization.cpp BusyFit.cpp DataCube.cpp MetaData.cpp Parametrization.cpp WorldCoordinateSystem.cpp
