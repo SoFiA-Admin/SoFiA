@@ -29,8 +29,8 @@ SoFiA:
   * Linux or Unix (e.g. Ubuntu, Mac OS, etc.)
   * Terminal with `bash` or `tcsh` (other shells should work as well)
 * Packages (Python):
-  * `Python` (≥ 2.7; including dev package; note that Python 3 should
-              work at this stage, but has not been fully tested yet.)
+  * `Python` (≥ 3.0; including dev package; note that Python 2.7 is no
+             longer supported at this point.)
   * `NumPy` (≥ 1.8)
   * `SciPy` (≥ 0.7)
   * `Astropy` (≥ 0.2.5)
