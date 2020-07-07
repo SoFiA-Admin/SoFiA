@@ -522,7 +522,7 @@ if Parameters["steps"]["doDebug"] and Parameters["steps"]["doMerge"] and NRdet:
 
 	outputCatAsciiPos = outputCatAscii.replace('_cat.ascii','_rel_poslogcat.ascii')
 	objectsPos=np.array(objects)[np.array(objects)[:,catParNames.index('snr_sum')] > 0]
-	posPars=['id','x','y','z']+Parameters["reliability"]["parSpace"]+['rel']
+	posPars=['id','x_geo','y_geo','z_geo']+Parameters["reliability"]["parSpace"]+['rel']
 	for ppar in posPars: # take log of pos pars
 		if ppar[:4]=='snr_':
 			objectsPos[:,catParNames.index(ppar)]=np.log10(np.abs(objectsPos[:,catParNames.index(ppar)]))
