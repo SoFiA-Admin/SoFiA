@@ -494,7 +494,7 @@ if Parameters["steps"]["doReliability"] and Parameters["steps"]["doMerge"] and N
 	# ---- CALCULATE RELIABILITY ----
 	err.print_progress_message("Determining reliability", t0)
 	objects, reliable = addrel.EstimateRel(np.array(objects), outroot, catParNames, **Parameters["reliability"])
-	err.message("The following {0:d} reliable sources have been detected: {1:}".format(reliable.shape[0],reliable))
+	err.message("The following {0:d} reliable sources have been detected: {1:}".format(len(reliable),reliable))
 	catParNames = tuple(list(catParNames) + ["n_pos",  "n_neg",  "rel"])
 	catParUnits = tuple(list(catParUnits) + ["-",      "-",      "-"])
 	catParFormt = tuple(list(catParFormt) + ["%12.3e", "%12.3e", "%12.6f"])
@@ -503,7 +503,7 @@ if Parameters["steps"]["doReliability"] and Parameters["steps"]["doMerge"] and N
 elif Parameters["steps"]["doMerge"] and NRdet:
 	err.print_progress_time(t0)
 	reliable = list(np.array(objects)[np.array(objects)[:,catParNames.index('snr_sum')] > 0,0].astype(int)) # select all positive sources
-	err.message("The following {0:d} sources have been detected: {1:}".format(reliable.shape[0],reliable))
+	err.message("The following {0:d} sources have been detected: {1:}".format(len(reliable),reliable))
 	if Parameters["pipeline"]["trackMemory"]: print_memory_usage(t0)
 
 else:
