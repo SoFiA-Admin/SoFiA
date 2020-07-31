@@ -399,7 +399,7 @@ def import_mask(maskFile, header, axis_size, subcube):
 	# 1-D spectrum
 	if n_axes_mask == 1:
 		err.warning("Mask cube has 1 axis; interpreted as spectrum.\nAdding first and second axis.")
-		ensure(header_mask['CRVAL1'] == header['CRVAL1'], "Input cube and mask are not on the same WCS grid.")
+		if header_mask['CRVAL1'] != header['CRVAL1']: err.warning("Input cube and mask may not be on the same WCS grid.")
 		
 		if len(subcube) == 6:
 			if header_mask["NAXIS1"] == axis_size[2]:
@@ -417,8 +417,7 @@ def import_mask(maskFile, header, axis_size, subcube):
 	
 	# 2-D image
 	elif n_axes_mask == 2:
-		err.ensure(header_mask["CRVAL1"] == header["CRVAL1"] and header_mask["CRVAL2"] == header["CRVAL2"],
-			"Input cube and mask are not on the same WCS grid.")
+		if header_mask["CRVAL1"] != header["CRVAL1"] or header_mask["CRVAL2"] != header["CRVAL2"]: err.warning("Input cube and mask may not be on the same WCS grid.")
 		
 		if len(subcube) == 6 or len(subcube) == 4:
 			if header_mask["NAXIS1"] == axis_size[0] and header_mask["NAXIS2"] == axis_size[1]:
@@ -433,7 +432,7 @@ def import_mask(maskFile, header, axis_size, subcube):
 	
 	# 3-D cube
 	elif n_axes_mask == 3:
-		err.ensure(header_mask["CRVAL1"] == header["CRVAL1"] and header_mask["CRVAL2"] == header["CRVAL2"] and header_mask["CRVAL3"] == header["CRVAL3"], "Input cube and mask are not on the same WCS grid.")
+		if header_mask["CRVAL1"] != header["CRVAL1"] or header_mask["CRVAL2"] != header["CRVAL2"] or header_mask["CRVAL3"] != header["CRVAL3"]: err.warning("Input cube and mask may not be on the same WCS grid.")
 		
 		if len(subcube) == 6:
 			if header_mask["NAXIS1"] == axis_size[0] and header_mask["NAXIS2"] == axis_size[1] and header_mask["NAXIS3"] == axis_size[2]:
@@ -448,7 +447,7 @@ def import_mask(maskFile, header, axis_size, subcube):
 	
 	# 4-D hypercube
 	else:
-		err.ensure(header_mask["CRVAL1"] == header["CRVAL1"] and header_mask["CRVAL2"] == header["CRVAL2"] and header_mask["CRVAL3"] == header["CRVAL3"], "Input cube and mask are not on the same WCS grid.")
+		if header_mask["CRVAL1"] != header["CRVAL1"] or header_mask["CRVAL2"] != header["CRVAL2"] or header_mask["CRVAL3"] != header["CRVAL3"]: err.warning("Input cube and mask may not be on the same WCS grid.")
 		
 		if len(subcube) == 6:
 			if header_mask["NAXIS1"] == axis_size[0] and header_mask["NAXIS2"] == axis_size[1] and header_mask["NAXIS3"] == axis_size[2]:

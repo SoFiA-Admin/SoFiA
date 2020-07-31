@@ -6,6 +6,7 @@ import os
 import sys
 from numpy import *
 import re
+from sofia import error as err
 
 
 def read_data(doSubcube, inFile, invertData, weightsFile, maskFile, sources, weightsFunction = None, subcube=[], subcubeMode="pixel", doFlag=False, flagRegions=False, flagFile="", cubeOnly=False):
@@ -385,69 +386,65 @@ def read_data(doSubcube, inFile, invertData, weightsFile, maskFile, sources, wei
 				dict_Mask_header = g[0].header
 				if dict_Mask_header["NAXIS"] == 3:
 					if dict_Mask_header["CRVAL1"] != dict_Header["CRVAL1"] or dict_Mask_header["CRVAL2"] != dict_Header["CRVAL2"] or dict_Mask_header["CRVAL3"] != dict_Header["CRVAL3"]:
-						sys.stderr.write("ERROR: Input cube and mask are not on the same WCS grid.\n")
-						sys.stderr.write(str(dict_Mask_header["CRVAL1"]) + " " + str(dict_Header["CRVAL1"]) + " " + str(dict_Mask_header["CRVAL2"]) + " " + str(dict_Header["CRVAL2"]) + " " + str(dict_Mask_header["CRVAL3"]) + " " + str(dict_Header["CRVAL3"]))
-						raise SystemExit(1)
-					elif len(subcube) == 6:
+						err.warning("Input cube and mask may not be on the same WCS grid.")
+						err.warning(str(dict_Mask_header["CRVAL1"]) + " " + str(dict_Header["CRVAL1"]) + " " + str(dict_Mask_header["CRVAL2"]) + " " + str(dict_Header["CRVAL2"]) + " " + str(dict_Mask_header["CRVAL3"]) + " " + str(dict_Header["CRVAL3"]))
+					if len(subcube) == 6:
 						if dict_Mask_header["NAXIS1"] == np_Cube.shape[2] and dict_Mask_header["NAXIS2"] == np_Cube.shape[1] and dict_Mask_header["NAXIS3"] == np_Cube.shape[0]:
-							print ("Subcube selection NOT applied to input mask. The full input mask cube matches size and WCS of the selected data subcube.")
+							print ("Subcube selection NOT applied to input mask. The full input mask cube matches size of the selected data subcube.")
 							mask = g[0].data
 						elif dict_Mask_header["NAXIS1"] == fullshape[2] and dict_Mask_header["NAXIS2"] == fullshape[1] and dict_Mask_header["NAXIS3"] == fullshape[0]:
-							print ("Subcube selection applied also to input mask. The mask subcube matches size and WCS of the selected data subcube.")
+							print ("Subcube selection applied also to input mask. The mask subcube matches size of the selected data subcube.")
 							mask = g[0].section[subcube[4]:subcube[5], subcube[2]:subcube[3], subcube[0]:subcube[1]]
 						else:
-							sys.stderr.write("ERROR: Neither the full mask nor the subcube of the mask match size and WCS of the selected data subcube.\n")
+							sys.stderr.write("ERROR: Neither the full mask nor the subcube of the mask match size of the selected data subcube.\n")
 							raise SystemExit(1)
 					else: mask = g[0].data
 				elif dict_Mask_header["NAXIS"] == 4:
 					if dict_Mask_header["CRVAL1"] != dict_Header["CRVAL1"] or dict_Mask_header["CRVAL2"] != dict_Header["CRVAL2"] or dict_Mask_header["CRVAL3"] != dict_Header["CRVAL3"]:
-						sys.stderr.write("ERROR: Input cube and mask are not on the same WCS grid.\n")
-						raise SystemExit(1)
-					elif dict_Mask_header["NAXIS4"] != 1:
+						err.warning("Input cube and mask may not be on the same WCS grid.")
+					if dict_Mask_header["NAXIS4"] != 1:
 						sys.stderr.write("ERROR: The 4th dimension has more than 1 value.\n")
 						raise SystemExit(1)
 					elif len(subcube) == 6:
 						sys.stderr.write("WARNING: The mask cube has 4 axes; first axis ignored.\n")
 						if dict_Mask_header["NAXIS1"] == np_Cube.shape[2] and dict_Mask_header["NAXIS2"] == np_Cube.shape[1] and dict_Mask_header["NAXIS3"] == np_Cube.shape[0]:
-							print ("Subcube selection NOT applied to input mask. The full input mask cube matches size and WCS of the selected data subcube.")
+							print ("Subcube selection NOT applied to input mask. The full input mask cube matches size of the selected data subcube.")
 							mask = g[0].section[0]
 						elif dict_Mask_header["NAXIS1"] == fullshape[2] and dict_Mask_header["NAXIS2"] == fullshape[1] and dict_Mask_header["NAXIS3"] == fullshape[0]:
-							print ("Subcube selection applied also to input mask. The mask subcube matches size and WCS of the selected data subcube.")
+							print ("Subcube selection applied also to input mask. The mask subcube matches size of the selected data subcube.")
 							mask = g[0].section[0, subcube[4]:subcube[5], subcube[2]:subcube[3], subcube[0]:subcube[1]]
 						else:
-							sys.stderr.write("ERROR: Neither the full mask nor the subcube of the mask match size and WCS of the selected data subcube.\n")
+							sys.stderr.write("ERROR: Neither the full mask nor the subcube of the mask match size of the selected data subcube.\n")
 							raise SystemExit(1)
 					else: mask = g[0].section[0]
 				elif dict_Mask_header["NAXIS"] == 2:
 					if dict_Mask_header["CRVAL1"] != dict_Header["CRVAL1"] or dict_Mask_header["CRVAL2"] != dict_Header["CRVAL2"]:
-						sys.stderr.write("ERROR: Input cube and mask are not on the same WCS grid.\n")
-						raise SystemExit(1)
+						err.warning("Input cube and mask may not be on the same WCS grid.")
 					sys.stderr.write("WARNING: The mask cube has 2 axes; third axis added.\n")
 					if len(subcube) == 6 or len(subcube) == 4:
 						if dict_Mask_header["NAXIS1"] == np_Cube.shape[2] and dict_Mask_header["NAXIS2"] == np_Cube.shape[1]:
-							print ("Subcube selection NOT applied to input mask. The full input mask cube matches size and WCS of the selected data subcube.")
+							print ("Subcube selection NOT applied to input mask. The full input mask cube matches size of the selected data subcube.")
 							mask = array([g[0].data])
 						elif dict_Mask_header["NAXIS1"] == fullshape[2] and dict_Mask_header["NAXIS2"] == fullshape[1]:
-							print ("Subcube selection applied also to input mask. The mask subcube matches size and WCS of the selected data subcube.")
+							print ("Subcube selection applied also to input mask. The mask subcube matches size of the selected data subcube.")
 							mask = array([g[0].section[subcube[2]:subcube[3], subcube[0]:subcube[1]]])
 						else:
-							sys.stderr.write("ERROR: Neither the full mask nor the subcube of the mask match size and WCS of the selected data subcube.\n")
+							sys.stderr.write("ERROR: Neither the full mask nor the subcube of the mask match size of the selected data subcube.\n")
 							raise SystemExit(1)
 					else: mask=array([g[0].data])
 				elif dict_Mask_header["NAXIS"] == 1:
 					sys.stderr.write("WARNING: The mask cube has 1 axis; interpreted as third axis; first and second axes added.\n")
 					if dict_Mask_header["CRVAL1"] != dict_Header["CRVAL1"]:
-						sys.stderr.write("ERROR: Input cube and mask are not on the same WCS grid.\n")
-						raise SystemExit(1)
+						err.warning("Input cube and mask may not be on the same WCS grid.")
 					if len(subcube) == 6:
 						if dict_Mask_header["NAXIS1"] == np_Cube.shape[0]:
-							print ("Subcube selection NOT applied to input mask. The full input mask cube matches size and WCS of the selected data subcube.")
+							print ("Subcube selection NOT applied to input mask. The full input mask cube matches size of the selected data subcube.")
 							mask = reshape(g[0].data, (-1, 1, 1))
 						elif dict_Mask_header["NAXIS1"] == fullshape[0]:
-							print ("Subcube selection applied also to input mask. The mask subcube matches size and WCS of the selected data subcube.")
+							print ("Subcube selection applied also to input mask. The mask subcube matches size of the selected data subcube.")
 							mask = reshape(g[0].section[subcube[4]:subcube[5]], (-1, 1, 1))
 						else:
-							sys.stderr.write("ERROR: Neither the full mask nor the subcube of the mask match size and WCS of the selected data subcube.\n")
+							sys.stderr.write("ERROR: Neither the full mask nor the subcube of the mask match size of the selected data subcube.\n")
 							raise SystemExit(1)
 					elif not len(subcube):
 						mask = reshape(g[0].data, (-1, 1, 1))
