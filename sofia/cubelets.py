@@ -237,7 +237,7 @@ def writeSubcube(cube, header, mask, objects, cathead, outroot, outputDir, compr
 		else:
 			subcubeCopy[submask == 0] = np.nan   # NOTE: Manually set to NaN to ensure correct generation of spectra below
 		
-		moments = [None, None, None]
+		moments = [None, None, None, None, None, None]
 		with np.errstate(invalid="ignore"):
 			# Definition of moment 0
 			moments[0] = np.nansum(subcubeCopy, axis=0)
@@ -245,16 +245,29 @@ def writeSubcube(cube, header, mask, objects, cathead, outroot, outputDir, compr
 			# Definition of moment 1
 			velArr = ((np.arange(subcubeCopy.shape[0]).reshape((subcubeCopy.shape[0], 1, 1)) + 1.0 - headerCubelets["CRPIX3"]) * headerCubelets["CDELT3"] + headerCubelets["CRVAL3"]) * scalemom12
 			moments[1] = np.divide(np.nansum(velArr * subcubeCopy, axis=0), moments[0])
+			moments[1][~np.isfinite(moments[1])] = np.nan
 			# NOTE: Here we make use of array broadcasting in NumPy, but we need to reshape the velocity array
 			#       from [nz] to [nz, 1, 1] for this to work, so that [nz, 1, 1] * [nz, ny, nx] --> [nz, ny, nx].
 			
 			# Definition of moment 2
-			velArr = velArr - moments[1]
-			moments[2] = np.sqrt(np.divide(np.nansum(velArr * velArr * subcubeCopy, axis=0), moments[0]))
+			velArrShift = velArr - moments[1]
+			moments[2] = np.sqrt(np.divide(np.nansum(velArrShift * velArrShift * subcubeCopy, axis=0), moments[0]))
+			moments[2][~np.isfinite(moments[2])] = np.nan
 			# NOTE: The above works due to array broadcasting in NumPy and despite different array dimensions.
 			#       [nz, 1, 1] - [ny, nx] --> [nz, ny, nx] according to NumPy's broadcasting rules.
+
+			# Moment 1 and 2 images considering positive voxels only
+			subcubeCopy[subcubeCopy < 0] = np.nan
+			moments[3] = np.nansum(subcubeCopy, axis=0)
+			moments[4] = np.divide(np.nansum(velArr * subcubeCopy, axis=0), moments[3])
+			moments[4][~np.isfinite(moments[4])] = np.nan
+			velArrShift = velArr - moments[4]
+			moments[5] = np.sqrt(np.divide(np.nansum(velArrShift * velArrShift * subcubeCopy, axis=0), moments[3]))
+			moments[5][~np.isfinite(moments[5])] = np.nan
+
 		
 		moments[0] *= dkms
+		moments[3] *= dkms
 		units = [headerCubelets["BUNIT"] + bunitExt, bunitExt[1:], bunitExt[1:]]
 		
 		for i in range(3):
@@ -267,6 +280,17 @@ def writeSubcube(cube, header, mask, objects, cathead, outroot, outputDir, compr
 			filename = outputDir + cubename + "_{0:d}_mom{1:d}.fits".format(int(obj[0]), i)
 			if compress: filename += ".gz"
 			if func.check_overwrite(filename, flagOverwrite): hdu.writeto(filename, output_verify="warn", **__astropy_arg_overwrite__)
+
+			if i:
+				hdu = fits.PrimaryHDU(data=moments[i+3], header=headerCubelets)
+				func.delete_3rd_axis(hdu.header)
+				hdu.header["BUNIT"]   = units[i]
+				hdu.header["DATAMIN"] = np.nanmin(moments[i+3])
+				hdu.header["DATAMAX"] = np.nanmax(moments[i+3])
+				hdu.header["ORIGIN"]  = sofia_version_full
+				filename = outputDir + cubename + "_{0:d}_posmom{1:d}.fits".format(int(obj[0]), i)
+				if compress: filename += ".gz"
+				if func.check_overwrite(filename, flagOverwrite): hdu.writeto(filename, output_verify="warn", **__astropy_arg_overwrite__)
 		
 		
 		# -------------------
