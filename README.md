@@ -125,6 +125,22 @@ SoFiA comes with its own built-in help browser that can be launched from
 the help menu in the user interface. Alternatively, you can use your web 
 browser to open the index.html file located in the gui/doc/ sub-folder.
 
+Further information about SoFiA is available from the SoFiA description
+paper:
+
+* **SoFiA: a flexible source finder for 3D spectral line data**
+  
+  Serra, P., Westmeier, T., Giese, N., Jurek, R., Flöer, L, Popping, A.,
+  Winkel, B., van der Hulst, J. M., Meyer, M., Koribalski, B. S.,
+  Staveley-Smith, L., Courtois, H., 2015, MNRAS, 448, 1922
+  
+  ADS link: http://adsabs.harvard.edu/abs/2015MNRAS.448.1922S
+
+If you find SoFiA useful and intend to use it in your own research, we
+would appreciate a reference to the SoFiA paper in any publication that
+results from your work.
+
+
 
 Version history
 ---------------
