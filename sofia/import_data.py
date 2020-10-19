@@ -498,7 +498,7 @@ def flag(cube, regions):
 			raise SystemExit(1)
 		
 		try:
-			for i in range(0, len(region) / 2):
+			for i in range(0, len(region) // 2):
 				if region[2 * i + 1] == "":
 					region[2 * i + 1] = cube.shape[dim - i - 1]
 			if len(region) == 4:
